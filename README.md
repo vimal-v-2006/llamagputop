@@ -55,6 +55,18 @@ For your CPU and RAM, it tracks utilisation, temperatures, frequency, RAPL power
 
 The tool is completely portable. Since it discovers hardware at runtime, it runs on any Linux machine. 
 
+## Web dashboard
+
+The same collectors, served as a browser UI. One Python file and one HTML file, stdlib only, no build step:
+
+```bash
+python3 webapp.py            # http://127.0.0.1:8371
+python3 webapp.py 8371       # explicit port
+```
+
+Open the URL and the dashboard polls the same data layer the TUI reads — GPU and CPU panels, memory, the power aggregate, and one llama card per live server, each with its status, prefill/gen speeds, KV fill and its full command-line config, plus rolling trend charts for utilisation, system power and generation. The refresh rate is switchable in the header (0.5 / 1 / 2 / 5 s). The server only listens on 127.0.0.1; the API is at `/api/state` if you want to script against it. The TUI and the dashboard are independent: run both at once, or neither.
+
+
 The tests live in `tests/` and use the standard library only, like the program: run them with `python3 -m unittest discover -s tests`. They need no particular hardware and touch no network, since every reader is driven against a temporary directory standing in for sysfs. Most of them come in pairs, because the difficult half of "a missing reading is a dash" is proving that a real zero still reads as zero: a parked fan, a power-gated GPU, an idle server and a freshly started card are all genuinely at zero and have to survive.
 
 To use it, just run the python script in your terminal. You can pass a port number to focus on a single server, or use the once or line flags for scripting and logging. The TUI is fully interactive. You can quit with q, scroll with your arrow keys, change the refresh rate with plus and minus, and reset the history with z.
